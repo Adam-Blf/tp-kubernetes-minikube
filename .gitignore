@@ -1,0 +1,26 @@
+# Archives de rendu (produites par la release)
+*.zip
+dist/
+
+# Brouillons de capture
+preuves-new/
+*.log
+
+# Environnements et outils
+.venv/
+__pycache__/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets, défense en profondeur
+.env
+.env.*
+*secret*
+*.token
+*.pem
+*.key
+kubeconfig*
+ghp_*
+github_pat_*

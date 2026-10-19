@@ -1,0 +1,59 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Validate manifests against the Kubernetes schema
+        run: |
+          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz | tar xz kubeconform
+          ./kubeconform -strict -summary manifests/ monapp-deployment.yaml
+      - name: Lint the Dockerfile
+        run: docker run --rm -i hadolint/hadolint:v2.15.1 < monapp/Dockerfile
+      - name: Check required deliverables
+        run: |
+          for f in README.md reponses.md manifests/pod.yaml manifests/deployment.yaml manifests/service.yaml \
+                   monapp/index.html monapp/Dockerfile monapp-deployment.yaml \
+                   preuves/01-cluster.png preuves/02-deployment.png preuves/03-autoreparation.png \
+                   preuves/04-service-http.png preuves/05-image-personnalisee.png; do
+            test -f "$f" || { echo "missing: $f"; exit 1; }
+          done
+      - name: Check version consistency
+        run: grep -q "version-$(cat VERSION)-" README.md
+
+  e2e:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.15.1
+      - name: Deploy the TP on a kind cluster
+        run: |
+          kubectl create namespace demo
+          kubectl config set-context --current --namespace=demo
+          docker build -t monapp:1.0 ./monapp
+          kind load docker-image monapp:1.0 --name chart-testing
+          kubectl apply -f manifests/deployment.yaml -f manifests/service.yaml -f monapp-deployment.yaml
+          kubectl rollout status deployment/whoami --timeout=180s
+          kubectl rollout status deployment/monapp --timeout=180s
+      - name: Self-healing keeps 3 replicas
+        run: |
+          kubectl delete pod "$(kubectl get pods -l app=whoami -o jsonpath='{.items[0].metadata.name}')"
+          kubectl rollout status deployment/whoami --timeout=120s
+          test "$(kubectl get pods -l app=whoami --no-headers | grep -c Running)" -eq 3
+      - name: Service answers over HTTP
+        run: |
+          test -n "$(kubectl get endpoints whoami-service -o jsonpath='{.subsets[0].addresses[*].ip}')"
+          kubectl port-forward service/whoami-service 8080:80 & sleep 5
+          curl -sf http://localhost:8080 | grep Hostname
+          kubectl port-forward deployment/monapp 8081:80 & sleep 5
+          curl -sf http://localhost:8081 | grep -i kubernetes

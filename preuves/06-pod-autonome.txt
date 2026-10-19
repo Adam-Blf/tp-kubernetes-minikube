@@ -1,0 +1,68 @@
+$ kubectl create namespace demo
+namespace/demo created
+
+$ kubectl config set-context --current --namespace=demo
+Context "minikube" modified.
+
+$ kubectl apply -f manifests/pod.yaml
+pod/whoami-pod created
+
+$ kubectl wait --for=condition=Ready pod/whoami-pod --timeout=180s
+pod/whoami-pod condition met
+
+$ kubectl get pods -o wide
+NAME         READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+whoami-pod   1/1     Running   0          3s    10.244.0.7   minikube   <none>           <none>
+
+$ kubectl describe pod whoami-pod | head -n 30
+Name:             whoami-pod
+Namespace:        demo
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Mon, 19 Oct 2026 14:46:45 +0200
+Labels:           app=whoami-pod
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.7
+IPs:
+  IP:  10.244.0.7
+Containers:
+  whoami:
+    Container ID:   containerd://27ded6ea93eaed042827f92ed056b42710fa29f19d2f5a1d06c610c8b577b9a5
+    Image:          traefik/whoami:v1.10.3
+    Image ID:       docker.io/traefik/whoami@sha256:43a68d10b9dfcfc3ffbfe4dd42100dc9aeaf29b3a5636c856337a5940f1b4f1c
+    Port:           80/TCP (http)
+    Host Port:      0/TCP (http)
+    State:          Running
+      Started:      Mon, 19 Oct 2026 14:46:47 +0200
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-bgqln (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+
+$ kubectl logs whoami-pod
+2026/10/19 12:46:47 Starting up on port 80
+
+$ kubectl exec whoami-pod -- sh -c hostname
+error: Internal error occurred: Internal error occurred: error executing command in container: failed to exec in container: failed to start exec "0d06544c85a3bfb12d9916cd55537f49ccd618adab9817a9aac630510d6ac291": OCI runtime exec failed: exec failed: unable to start container process: exec: "sh": executable file not found in $PATH
+
+# traefik/whoami ne contient ni shell ni binaire hostname : on attache un conteneur de débogage busybox qui partage l'espace de noms du Pod.
+
+$ kubectl debug whoami-pod -q --image=busybox:1.36 --target=whoami --attach=true -- hostname
+warning: couldn't attach to pod/whoami-pod, falling back to streaming logs: Internal error occurred: Internal error occurred: error attaching to container: failed to load task: no running task found: task fd4dcfe7d9bdc3ba03845b33c4c49b617f904246bb1771f7039654df59031006 not found
+whoami-pod
+
+$ kubectl delete pod whoami-pod
+pod "whoami-pod" deleted from demo namespace
+
+$ kubectl get pods
+No resources found in demo namespace.
+
+# Le Pod autonome ne revient pas : aucun contrôleur ne le surveille.
+
