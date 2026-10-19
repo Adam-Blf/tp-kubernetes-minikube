@@ -1,0 +1,45 @@
+$ kubectl scale deployment whoami --replicas=5
+deployment.apps/whoami scaled
+
+$ kubectl rollout status deployment/whoami --timeout=120s
+Waiting for deployment "whoami" rollout to finish: 3 of 5 updated replicas are available...
+Waiting for deployment "whoami" rollout to finish: 4 of 5 updated replicas are available...
+deployment "whoami" successfully rolled out
+
+$ kubectl get pods
+NAME                     READY   STATUS    RESTARTS   AGE
+whoami-c6f799d48-48xfk   1/1     Running   0          2s
+whoami-c6f799d48-cfzzv   1/1     Running   0          2s
+whoami-c6f799d48-dfhhb   1/1     Running   0          16s
+whoami-c6f799d48-vz8df   1/1     Running   0          24s
+whoami-c6f799d48-w4hdh   1/1     Running   0          24s
+
+$ kubectl scale deployment whoami --replicas=0
+deployment.apps/whoami scaled
+
+$ kubectl get pods
+NAME                     READY   STATUS        RESTARTS   AGE
+whoami-c6f799d48-48xfk   1/1     Terminating   0          3s
+whoami-c6f799d48-cfzzv   1/1     Terminating   0          3s
+whoami-c6f799d48-dfhhb   1/1     Terminating   0          17s
+whoami-c6f799d48-vz8df   1/1     Terminating   0          25s
+whoami-c6f799d48-w4hdh   1/1     Terminating   0          25s
+
+$ kubectl get pods
+No resources found in demo namespace.
+
+$ kubectl scale deployment whoami --replicas=3
+deployment.apps/whoami scaled
+
+$ kubectl rollout status deployment/whoami --timeout=120s
+Waiting for deployment "whoami" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "whoami" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "whoami" rollout to finish: 2 of 3 updated replicas are available...
+deployment "whoami" successfully rolled out
+
+$ kubectl get pods
+NAME                     READY   STATUS    RESTARTS   AGE
+whoami-c6f799d48-29hc6   1/1     Running   0          2s
+whoami-c6f799d48-kq588   1/1     Running   0          2s
+whoami-c6f799d48-l7wqf   1/1     Running   0          2s
+

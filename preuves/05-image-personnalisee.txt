@@ -1,0 +1,45 @@
+$ docker build -t monapp:1.0 ./monapp 2>&1 | tail -n 12
+#6 CACHED
+
+#7 exporting to image
+#7 exporting layers done
+#7 exporting manifest sha256:962edb01a38286f51408ff8921d1326972cf2b03d3ff910f3dec15534e81559c done
+#7 exporting config sha256:0bcd16355240f765cf2107f196fee6e609a5d92b8ba91778ed98d1a9a2c286c3 done
+#7 exporting attestation manifest sha256:b9b1748871d183da3fc24ee0e268a61207b7374a314fef19f328de07bca0ff0a 0.0s done
+#7 exporting manifest list sha256:9188c124b6dd0d4f85108d62f99c9d8ec488cb05eb06ccb23432a6737f37235d 0.0s done
+#7 naming to docker.io/library/monapp:1.0
+#7 naming to docker.io/library/monapp:1.0 done
+#7 unpacking to docker.io/library/monapp:1.0 0.0s done
+#7 DONE 0.2s
+
+$ minikube image load monapp:1.0
+
+$ minikube image ls | grep monapp
+docker.io/library/monapp:1.0
+
+$ kubectl apply -f monapp-deployment.yaml
+deployment.apps/monapp created
+
+$ kubectl rollout status deployment/monapp --timeout=120s
+Waiting for deployment "monapp" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "monapp" rollout to finish: 1 of 2 updated replicas are available...
+deployment "monapp" successfully rolled out
+
+$ kubectl get pods -l app=monapp
+NAME                      READY   STATUS    RESTARTS   AGE
+monapp-577998cd66-62ktp   1/1     Running   0          9s
+monapp-577998cd66-tx2fc   1/1     Running   0          9s
+
+$ curl -s http://localhost:8081
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mon application sur Kubernetes</title>
+</head>
+<body>
+  <h1>Mon application sur Kubernetes</h1>
+  <p>Bonjour ! Cette page est servie par un conteneur Nginx déployé avec Minikube.</p>
+</body>
+</html>
+

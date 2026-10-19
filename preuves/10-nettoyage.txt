@@ -1,0 +1,22 @@
+$ kubectl delete -f manifests/service.yaml --ignore-not-found
+service "whoami-service" deleted from demo namespace
+
+$ kubectl delete -f manifests/deployment.yaml --ignore-not-found
+deployment.apps "whoami" deleted from demo namespace
+
+$ kubectl delete -f manifests/pod.yaml --ignore-not-found
+
+$ kubectl delete -f monapp-deployment.yaml --ignore-not-found
+deployment.apps "monapp" deleted from demo namespace
+
+$ kubectl delete namespace demo
+namespace "demo" deleted
+
+$ kubectl config set-context --current --namespace=default
+Context "minikube" modified.
+
+$ minikube stop
+* Stopping node "minikube"  ...
+* Powering off "minikube" via SSH ...
+* 1 node stopped.
+

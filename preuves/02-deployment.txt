@@ -1,0 +1,59 @@
+$ kubectl apply -f manifests/deployment.yaml
+deployment.apps/whoami created
+
+$ kubectl rollout status deployment/whoami --timeout=180s
+Waiting for deployment "whoami" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "whoami" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "whoami" rollout to finish: 2 of 3 updated replicas are available...
+deployment "whoami" successfully rolled out
+
+$ kubectl get deployment,replicaset,pods
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/whoami   3/3     3            3           2s
+
+NAME                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/whoami-c6f799d48   3         3         3       2s
+
+NAME                         READY   STATUS    RESTARTS   AGE
+pod/whoami-c6f799d48-cdvzq   1/1     Running   0          2s
+pod/whoami-c6f799d48-vz8df   1/1     Running   0          2s
+pod/whoami-c6f799d48-w4hdh   1/1     Running   0          2s
+
+$ kubectl get pods --show-labels
+NAME                     READY   STATUS    RESTARTS   AGE   LABELS
+whoami-c6f799d48-cdvzq   1/1     Running   0          3s    app=whoami,pod-template-hash=c6f799d48
+whoami-c6f799d48-vz8df   1/1     Running   0          3s    app=whoami,pod-template-hash=c6f799d48
+whoami-c6f799d48-w4hdh   1/1     Running   0          3s    app=whoami,pod-template-hash=c6f799d48
+
+$ kubectl describe deployment whoami | head -n 30
+Name:                   whoami
+Namespace:              demo
+CreationTimestamp:      Mon, 19 Oct 2026 14:46:58 +0200
+Labels:                 app=whoami
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=whoami
+Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=whoami
+  Containers:
+   whoami:
+    Image:         traefik/whoami:v1.10.3
+    Port:          80/TCP (http)
+    Host Port:     0/TCP (http)
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   whoami-c6f799d48 (3/3 replicas created)
+Events:
+

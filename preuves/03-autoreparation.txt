@@ -1,0 +1,40 @@
+$ kubectl get pods
+NAME                     READY   STATUS    RESTARTS   AGE
+whoami-c6f799d48-cdvzq   1/1     Running   0          3s
+whoami-c6f799d48-vz8df   1/1     Running   0          3s
+whoami-c6f799d48-w4hdh   1/1     Running   0          3s
+
+$ kubectl delete pod whoami-c6f799d48-cdvzq --wait=false
+pod "whoami-c6f799d48-cdvzq" deleted from demo namespace
+
+$ kubectl get pods
+NAME                     READY   STATUS              RESTARTS   AGE
+whoami-c6f799d48-cdvzq   1/1     Terminating         0          8s
+whoami-c6f799d48-dfhhb   0/1     ContainerCreating   0          0s
+whoami-c6f799d48-vz8df   1/1     Running             0          8s
+whoami-c6f799d48-w4hdh   1/1     Running             0          8s
+
+# Ci-dessus : le Pod supprimé est en Terminating à côté de son remplaçant créé par le ReplicaSet.
+
+$ kubectl get pods -w --output-watch-events   (second terminal, Ctrl+C après 12 s)
+EVENT      NAME                     READY   STATUS    RESTARTS   AGE
+ADDED      whoami-c6f799d48-cdvzq   1/1     Running   0          4s
+ADDED      whoami-c6f799d48-vz8df   1/1     Running   0          4s
+ADDED      whoami-c6f799d48-w4hdh   1/1     Running   0          4s
+MODIFIED   whoami-c6f799d48-cdvzq   1/1     Terminating   0          8s
+ADDED      whoami-c6f799d48-dfhhb   0/1     Pending       0          0s
+MODIFIED   whoami-c6f799d48-cdvzq   1/1     Terminating   0          8s
+MODIFIED   whoami-c6f799d48-dfhhb   0/1     Pending       0          0s
+MODIFIED   whoami-c6f799d48-dfhhb   0/1     ContainerCreating   0          0s
+MODIFIED   whoami-c6f799d48-cdvzq   0/1     Error               0          9s
+MODIFIED   whoami-c6f799d48-dfhhb   0/1     ContainerCreating   0          1s
+MODIFIED   whoami-c6f799d48-dfhhb   1/1     Running             0          2s
+MODIFIED   whoami-c6f799d48-cdvzq   0/1     Error               0          10s
+DELETED    whoami-c6f799d48-cdvzq   0/1     Error               0          10s
+
+$ kubectl get pods
+NAME                     READY   STATUS    RESTARTS   AGE
+whoami-c6f799d48-dfhhb   1/1     Running   0          13s
+whoami-c6f799d48-vz8df   1/1     Running   0          21s
+whoami-c6f799d48-w4hdh   1/1     Running   0          21s
+
