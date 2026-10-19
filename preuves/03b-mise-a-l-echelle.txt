@@ -8,22 +8,22 @@ deployment "whoami" successfully rolled out
 
 $ kubectl get pods
 NAME                     READY   STATUS    RESTARTS   AGE
-whoami-c6f799d48-48xfk   1/1     Running   0          2s
-whoami-c6f799d48-cfzzv   1/1     Running   0          2s
-whoami-c6f799d48-dfhhb   1/1     Running   0          16s
-whoami-c6f799d48-vz8df   1/1     Running   0          24s
-whoami-c6f799d48-w4hdh   1/1     Running   0          24s
+whoami-c6f799d48-cgvzt   1/1     Running   0          2s
+whoami-c6f799d48-jqn9h   1/1     Running   0          2s
+whoami-c6f799d48-p7gzb   1/1     Running   0          20s
+whoami-c6f799d48-pkqbz   1/1     Running   0          15s
+whoami-c6f799d48-qzz67   1/1     Running   0          20s
 
 $ kubectl scale deployment whoami --replicas=0
 deployment.apps/whoami scaled
 
 $ kubectl get pods
 NAME                     READY   STATUS        RESTARTS   AGE
-whoami-c6f799d48-48xfk   1/1     Terminating   0          3s
-whoami-c6f799d48-cfzzv   1/1     Terminating   0          3s
-whoami-c6f799d48-dfhhb   1/1     Terminating   0          17s
-whoami-c6f799d48-vz8df   1/1     Terminating   0          25s
-whoami-c6f799d48-w4hdh   1/1     Terminating   0          25s
+whoami-c6f799d48-cgvzt   1/1     Terminating   0          2s
+whoami-c6f799d48-jqn9h   1/1     Terminating   0          2s
+whoami-c6f799d48-p7gzb   1/1     Terminating   0          20s
+whoami-c6f799d48-pkqbz   1/1     Terminating   0          15s
+whoami-c6f799d48-qzz67   1/1     Terminating   0          20s
 
 $ kubectl get pods
 No resources found in demo namespace.
@@ -39,7 +39,7 @@ deployment "whoami" successfully rolled out
 
 $ kubectl get pods
 NAME                     READY   STATUS    RESTARTS   AGE
-whoami-c6f799d48-29hc6   1/1     Running   0          2s
-whoami-c6f799d48-kq588   1/1     Running   0          2s
-whoami-c6f799d48-l7wqf   1/1     Running   0          2s
+whoami-c6f799d48-mj26z   1/1     Running   0          1s
+whoami-c6f799d48-stz5f   1/1     Running   0          1s
+whoami-c6f799d48-z2xxf   1/1     Running   0          1s
 

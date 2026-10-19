@@ -1,16 +1,16 @@
 $ docker build -t monapp:1.0 ./monapp 2>&1 | tail -n 12
-#6 CACHED
 
 #7 exporting to image
-#7 exporting layers done
-#7 exporting manifest sha256:962edb01a38286f51408ff8921d1326972cf2b03d3ff910f3dec15534e81559c done
-#7 exporting config sha256:0bcd16355240f765cf2107f196fee6e609a5d92b8ba91778ed98d1a9a2c286c3 done
-#7 exporting attestation manifest sha256:b9b1748871d183da3fc24ee0e268a61207b7374a314fef19f328de07bca0ff0a 0.0s done
-#7 exporting manifest list sha256:9188c124b6dd0d4f85108d62f99c9d8ec488cb05eb06ccb23432a6737f37235d 0.0s done
-#7 naming to docker.io/library/monapp:1.0
-#7 naming to docker.io/library/monapp:1.0 done
-#7 unpacking to docker.io/library/monapp:1.0 0.0s done
-#7 DONE 0.2s
+#7 exporting layers 0.1s done
+#7 exporting manifest sha256:1026cd59977e8a1b4d7211526bb47ca1d6ba927ca9a0beb3ba951530ddf4c5f5 0.0s done
+#7 exporting config sha256:54a1ba4cbee6c2ac20a8e2f38e79298fe3c4c73a4632b98b1b082e7b9e9bbad7 0.0s done
+#7 exporting attestation manifest sha256:b1b64b766eb2cfc419c9e489286c352646856e688784f32332158917259f41d6 0.0s done
+#7 exporting manifest list sha256:2937f86958c28ecc8df72c62bbe1c31526bde1f73d7418780bfccb7d02f96a50
+#7 exporting manifest list sha256:2937f86958c28ecc8df72c62bbe1c31526bde1f73d7418780bfccb7d02f96a50 0.1s done
+#7 naming to docker.io/library/monapp:1.0 0.0s done
+#7 unpacking to docker.io/library/monapp:1.0
+#7 unpacking to docker.io/library/monapp:1.0 0.3s done
+#7 DONE 0.7s
 
 $ minikube image load monapp:1.0
 
@@ -27,19 +27,37 @@ deployment "monapp" successfully rolled out
 
 $ kubectl get pods -l app=monapp
 NAME                      READY   STATUS    RESTARTS   AGE
-monapp-577998cd66-62ktp   1/1     Running   0          9s
-monapp-577998cd66-tx2fc   1/1     Running   0          9s
+monapp-577998cd66-7mthz   1/1     Running   0          1s
+monapp-577998cd66-p92s2   1/1     Running   0          1s
 
 $ curl -s http://localhost:8081
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mon application sur Kubernetes</title>
+  <style>
+    :root { --navy: #051832; --bleu: #163767; --rose: #FF43B8; --clair: #F4F4F4; }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      min-height: 100vh; display: grid; place-items: center; padding: 24px;
+      background: var(--bleu); color: var(--clair);
+      font-family: Gilroy, "Segoe UI", system-ui, sans-serif;
+    }
+    main { max-width: 640px; padding: 40px 44px; background: var(--navy); border-radius: 12px; }
+    h1 { font-size: 2.2rem; font-weight: 800; }
+    h1::after { content: ""; display: block; width: 64px; height: 3px; margin-top: 14px; background: var(--rose); }
+    p { line-height: 1.6; margin-top: 18px; }
+    footer { margin-top: 28px; font-size: .9rem; color: #C9D3E0; }
+  </style>
 </head>
 <body>
-  <h1>Mon application sur Kubernetes</h1>
-  <p>Bonjour ! Cette page est servie par un conteneur Nginx déployé avec Minikube.</p>
+  <main>
+    <h1>Mon application sur Kubernetes</h1>
+    <p>Bonjour ! Cette page est servie par un conteneur Nginx déployé avec Minikube.</p>
+    <footer>EFREI, M2 Data Engineering &amp; IA - TP Kubernetes d'Adam Beloucif et Emilien Morice</footer>
+  </main>
 </body>
 </html>
 

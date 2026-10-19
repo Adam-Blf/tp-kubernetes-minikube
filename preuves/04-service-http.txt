@@ -2,8 +2,8 @@ $ kubectl apply -f manifests/service.yaml
 service/whoami-service created
 
 $ kubectl get services
-NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
-whoami-service   ClusterIP   10.96.231.156   <none>        80/TCP    0s
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+whoami-service   ClusterIP   10.109.228.114   <none>        80/TCP    0s
 
 $ kubectl get endpoints whoami-service
 Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
@@ -12,17 +12,17 @@ whoami-service   10.244.0.14:80,10.244.0.15:80,10.244.0.16:80   0s
 
 $ kubectl get pods -o wide
 NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES
-whoami-c6f799d48-29hc6   1/1     Running   0          3s    10.244.0.16   minikube   <none>           <none>
-whoami-c6f799d48-kq588   1/1     Running   0          3s    10.244.0.14   minikube   <none>           <none>
-whoami-c6f799d48-l7wqf   1/1     Running   0          3s    10.244.0.15   minikube   <none>           <none>
+whoami-c6f799d48-mj26z   1/1     Running   0          3s    10.244.0.14   minikube   <none>           <none>
+whoami-c6f799d48-stz5f   1/1     Running   0          3s    10.244.0.15   minikube   <none>           <none>
+whoami-c6f799d48-z2xxf   1/1     Running   0          3s    10.244.0.16   minikube   <none>           <none>
 
 $ curl -s http://localhost:8080
-Hostname: whoami-c6f799d48-29hc6
+Hostname: whoami-c6f799d48-mj26z
 IP: 127.0.0.1
 IP: ::1
-IP: 10.244.0.16
-IP: fe80::cce8:38ff:fe14:6542
-RemoteAddr: 127.0.0.1:57720
+IP: 10.244.0.14
+IP: fe80::b864:67ff:fea4:46bd
+RemoteAddr: 127.0.0.1:37188
 GET / HTTP/1.1
 Host: localhost:8080
 User-Agent: curl/8.18.0

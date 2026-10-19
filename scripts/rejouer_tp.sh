@@ -9,6 +9,12 @@ F=""
 sec() { F="$O/$1.txt"; : > "$F"; }
 run() { printf '$ %s\n' "$*" >> "$F"; bash -c "$*" >> "$F" 2>&1; echo >> "$F"; }
 note() { printf '# %s\n\n' "$*" >> "$F"; }
+CHROME="${CHROME:-/c/Program Files/Google/Chrome/Application/chrome.exe}"
+# Capture de la page vue dans un vrai navigateur (Chrome sans interface).
+shot() {
+  out="$O/$1.png"; command -v cygpath > /dev/null && out="$(cygpath -w "$out")"
+  "$CHROME" --headless=new --disable-gpu --hide-scrollbars --window-size=1280,720 --screenshot="$out" "$2" > /dev/null 2>&1
+}
 
 sec 01-cluster
 run docker version
@@ -53,7 +59,7 @@ run kubectl get pods
 note "Ci-dessus : le Pod supprimé est en Terminating à côté de son remplaçant créé par le ReplicaSet."
 sleep 12
 kill $WP 2>/dev/null
-printf '$ kubectl get pods -w --output-watch-events   (second terminal, Ctrl+C apres 12 s)\n' >> "$F"
+printf '$ kubectl get pods -w --output-watch-events   (second terminal, Ctrl+C après 12 s)\n' >> "$F"
 cat "$O/watch.log" >> "$F"; echo >> "$F"; rm -f "$O/watch.log"
 run kubectl get pods
 
@@ -77,6 +83,7 @@ run kubectl get pods -o wide
 kubectl port-forward service/whoami-service 8080:80 > /dev/null 2>&1 & PF=$!
 sleep 4
 run curl -s http://localhost:8080
+shot 04b-navigateur-whoami-brut http://localhost:8080
 kill $PF 2>/dev/null
 
 sec 05-image-personnalisee
@@ -89,6 +96,7 @@ run kubectl get pods -l app=monapp
 kubectl port-forward deployment/monapp 8081:80 > /dev/null 2>&1 & PF=$!
 sleep 4
 run curl -s http://localhost:8081
+shot 05b-navigateur-monapp-brut http://localhost:8081
 kill $PF 2>/dev/null
 
 sec 10-nettoyage
