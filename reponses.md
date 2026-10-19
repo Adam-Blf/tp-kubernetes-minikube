@@ -1,6 +1,6 @@
 # Réponses aux questions du TP Kubernetes
 
-## Question du §3 : nœud et composants système
+## Question de la partie 3 : nœud et composants système
 
 Le cluster ne compte qu'un seul nœud, `minikube`, de rôle `control-plane`, au statut `Ready` (Kubernetes v1.37.0, IP interne 192.168.49.2, runtime `containerd://2.3.4`, Debian 12). Il porte à la fois le plan de contrôle et les charges applicatives.
 

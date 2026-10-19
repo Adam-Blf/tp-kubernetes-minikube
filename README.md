@@ -1,6 +1,9 @@
 # TP Kubernetes : premiers déploiements avec Minikube et Docker
 
-![version](https://img.shields.io/badge/version-1.0.0-001329?style=flat-square)
+<img src="docs/assets/Logo-Efrei-CMJN.png" alt="EFREI" height="56">
+
+![version](https://img.shields.io/badge/version-1.0.0-163767?style=flat-square)
+![EFREI](https://img.shields.io/badge/EFREI-M2%20Data%20Engineering-FF43B8?style=flat-square)
 [![ci](https://img.shields.io/github/actions/workflow/status/Adam-Blf/tp-kubernetes-minikube/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/Adam-Blf/tp-kubernetes-minikube/actions/workflows/ci.yml)
 <!-- adam-badges:start -->
 [![commits](https://img.shields.io/github/commit-activity/t/Adam-Blf/tp-kubernetes-minikube?color=001329&label=commits&style=flat-square)](https://github.com/Adam-Blf/tp-kubernetes-minikube/commits)
@@ -11,7 +14,10 @@
 <!-- adam-badges:end -->
 
 EFREI, M2 Data Engineering & IA, module DevOps (cours Nowledgeable « devops M2 efrei DATA »).
-Rapport complet avec toutes les captures : [`docs/RAPPORT.md`](docs/RAPPORT.md).
+Rapport complet avec toutes les captures : [`docs/RAPPORT.md`](docs/RAPPORT.md), et sa version PDF
+[`docs/Rapport_TP_Kubernetes_Beloucif_Morice.pdf`](docs/Rapport_TP_Kubernetes_Beloucif_Morice.pdf).
+
+![Page monapp vue dans le navigateur](preuves/05b-navigateur-monapp.png)
 
 ## Membres du binôme
 
@@ -51,14 +57,14 @@ flowchart LR
     dev -- port-forward 8080 --> svc
     dev -- port-forward 8081 --> dep2
 
-    classDef input fill:#2563eb,stroke:#1e3a8a,color:#fff
-    classDef process fill:#7c3aed,stroke:#4c1d95,color:#fff
-    classDef store fill:#f59e0b,stroke:#92400e,color:#111
-    classDef ok fill:#16a34a,stroke:#14532d,color:#fff
-    classDef error fill:#dc2626,stroke:#7f1d1d,color:#fff
+    classDef input fill:#0C78B4,stroke:#051832,color:#fff
+    classDef process fill:#163767,stroke:#051832,color:#fff
+    classDef store fill:#F4F4F4,stroke:#163767,color:#111
+    classDef ok fill:#2E9E6B,stroke:#14532d,color:#fff
+    classDef error fill:#FF43B8,stroke:#9c1d6e,color:#111
 ```
 
-Le Pod autonome est en rouge : rien ne le recrée. Il porte volontairement le label
+Couleurs de la charte EFREI : bleu pour ce qui pilote, rose pour le Pod autonome, que rien ne recrée. Il porte volontairement le label
 `app=whoami-pod` pour rester hors du Service.
 
 ## Arborescence
@@ -79,7 +85,7 @@ Le Pod autonome est en rouge : rien ne le recrée. Il porte volontairement le la
 
 ## Étapes réalisées
 
-| § | Étape | Preuve |
+| Partie | Étape | Preuve |
 |---|---|---|
 | 3 | Versions, `minikube start --driver=docker`, `status`, `docker ps`, `cluster-info`, nœud, pods système | `preuves/01-cluster.png` |
 | 4 | Namespace `demo`, Pod `whoami-pod` : `get`, `describe`, `logs`, `hostname`, suppression sans retour | `preuves/06-pod-autonome.png` |
@@ -87,7 +93,9 @@ Le Pod autonome est en rouge : rien ne le recrée. Il porte volontairement le la
 | 5 | Suppression d'un Pod : `Terminating` à côté de son remplaçant, `get pods -w` | `preuves/03-autoreparation.png` |
 | 5 | `scale` à 5, 0 puis 3, `rollout status` | `preuves/03b-mise-a-l-echelle.png` |
 | 6 | Service ClusterIP, endpoints, `port-forward` 8080 et `curl` | `preuves/04-service-http.png` |
+| 6 | Vue navigateur de `whoami` via le Service | `preuves/04b-navigateur-whoami.png` |
 | 7 | `docker build`, `minikube image load`, Deployment `monapp`, `port-forward` 8081 | `preuves/05-image-personnalisee.png` |
+| 7 | Vue navigateur de la page monapp aux couleurs EFREI | `preuves/05b-navigateur-monapp.png` |
 | 10 | Suppression des ressources et du namespace, `minikube stop` | `preuves/10-nettoyage.png` |
 
 Tout le TP se rejoue d'une commande : `bash scripts/rejouer_tp.sh` écrit les sorties

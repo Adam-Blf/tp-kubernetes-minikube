@@ -14,8 +14,9 @@ la mise à l'échelle, on expose l'application par un Service, et on finit par d
 une image construite soi-même.
 
 Toutes les captures de ce rapport proviennent d'une même exécution complète du TP,
-rejouée le 19/10/2026 par `scripts/rejouer_tp.sh`. Chaque capture est le rendu fidèle
-de la sortie brute conservée à côté d'elle dans `preuves/*.txt`.
+rejouée le 19/10/2026 par `scripts/rejouer_tp.sh`. Chaque capture de terminal est le
+rendu fidèle de la sortie brute conservée à côté d'elle dans `preuves/*.txt`. Les deux
+vues navigateur sont prises par Chrome sans interface pendant la même exécution.
 
 ## Environnement
 
@@ -27,7 +28,7 @@ de la sortie brute conservée à côté d'elle dans `preuves/*.txt`.
 | Kubernetes (nœud) | v1.37.0, runtime containerd 2.3.4 |
 | Système | Windows 11 Pro, Docker Desktop (WSL2), driver docker |
 
-## Démarrer et vérifier le cluster (§3)
+## Démarrer et vérifier le cluster (partie 3)
 
 Commandes : `docker version`, `kubectl version --client`, `minikube version`,
 `minikube start --driver=docker`, `minikube status`, `docker ps`, `kubectl cluster-info`,
@@ -52,12 +53,12 @@ et `storage-provisioner`.
 Le profil Minikube existait déjà. `minikube start` le réutilise et signale qu'on ne peut
 pas changer sa taille mémoire sans le supprimer, ce qui n'empêche pas le démarrage.
 
-## Namespace et Pod autonome (§4)
+## Namespace et Pod autonome (partie 4)
 
 On crée le namespace `demo`, on en fait le namespace courant, puis on applique
 `manifests/pod.yaml` : un Pod `whoami-pod`, image `traefik/whoami:v1.10.3`, port 80.
 
-![Figure 6](../preuves/06-pod-autonome.png)
+![Figure 2](../preuves/06-pod-autonome.png)
 
 `get`, `describe` et `logs` montrent un Pod `Running` qui écoute sur le port 80.
 
@@ -74,75 +75,82 @@ rien : aucun contrôleur ne possède ce Pod, il ne revient pas.
 Le Pod porte le label `app: whoami-pod` et non `app: whoami` : sinon le Service de la
 partie 6 le sélectionnerait aussi.
 
-## Deployment à trois réplicas (§5)
+## Deployment à trois réplicas (partie 5)
 
 `manifests/deployment.yaml` décrit un Deployment `apps/v1` nommé `whoami`, à 3 réplicas.
 Son `spec.selector.matchLabels` (`app: whoami`) correspond aux labels du modèle de Pod.
 
-![Figure 2](../preuves/02-deployment.png)
+![Figure 3](../preuves/02-deployment.png)
 
 `kubectl get deployment,replicaset,pods` montre la chaîne de possession : le Deployment
 `whoami` crée le ReplicaSet `whoami-c6f799d48`, qui crée trois Pods nommés d'après lui.
 `--show-labels` confirme que chaque Pod porte `app=whoami` et le `pod-template-hash` du
 ReplicaSet.
 
-## Auto-réparation (§5)
+## Auto-réparation (partie 5)
 
 On supprime un Pod du Deployment par son nom réel pendant qu'un second terminal observe
 avec `kubectl get pods -w`.
 
-![Figure 3](../preuves/03-autoreparation.png)
+![Figure 4](../preuves/03-autoreparation.png)
 
-Juste après la suppression, le Pod `cdvzq` est en `Terminating` à côté de son remplaçant
-`dfhhb` en `ContainerCreating`. Le flux d'événements donne l'ordre exact : le Pod supprimé
-passe en `Terminating`, le ReplicaSet crée aussitôt `dfhhb` (`Pending`, `ContainerCreating`,
-`Running` en 2 secondes), et l'ancien Pod est retiré. On revient à trois Pods `Running`.
+Juste après la suppression, le Pod `4qwhk` est en `Terminating` à côté de son remplaçant
+`pkqbz` en `ContainerCreating`. Le flux d'événements donne l'ordre exact : le Pod supprimé
+passe en `Terminating`, le ReplicaSet crée aussitôt `pkqbz` (`Pending`, `ContainerCreating`,
+`Running` en moins de 2 secondes), et l'ancien Pod est retiré. On revient à trois Pods `Running`.
 
-## Mise à l'échelle (§5)
+## Mise à l'échelle (partie 5)
 
-![Figure 3b](../preuves/03b-mise-a-l-echelle.png)
+![Figure 5](../preuves/03b-mise-a-l-echelle.png)
 
 - **5 réplicas** : deux Pods sont ajoutés, les trois existants sont conservés.
 - **0 réplica** : les cinq Pods passent en `Terminating`, puis plus aucun Pod n'existe ; le Deployment et son ReplicaSet restent.
 - **3 réplicas** : trois nouveaux Pods sont créés et `rollout status` confirme la fin du déploiement.
 
-## Service (§6)
+## Service (partie 6)
 
 `manifests/service.yaml` décrit un Service `whoami-service` de type `ClusterIP`, qui
 sélectionne `app: whoami` et envoie le port 80 vers le port nommé `http` des conteneurs.
 
-![Figure 4](../preuves/04-service-http.png)
+![Figure 6](../preuves/04-service-http.png)
 
 Les trois endpoints (`10.244.0.14`, `.15`, `.16` sur le port 80) sont exactement les IP
 des trois Pods données par `kubectl get pods -o wide` : le Service cible les bons Pods.
 Via `kubectl port-forward service/whoami-service 8080:80`, `curl` reçoit la réponse de
-`whoami`, dont la ligne `Hostname` porte le nom d'un Pod du Deployment.
+`whoami`, dont la ligne `Hostname` porte le nom d'un Pod du Deployment. La même
+adresse ouverte dans Chrome donne la vue navigateur de la figure 7.
 
-## Image personnalisée (§7)
+![Figure 7](../preuves/04b-navigateur-whoami.png)
 
-`monapp/index.html` contient un titre et un message en français, et `monapp/Dockerfile`
+## Image personnalisée (partie 7)
+
+`monapp/index.html` contient un titre et un message en français, mis en forme avec la
+charte EFREI (navy, bleu primaire et rose signature, styles en ligne sans CDN), et `monapp/Dockerfile`
 part de `nginx:1.27` et copie la page dans `/usr/share/nginx/html/`.
 
-![Figure 5](../preuves/05-image-personnalisee.png)
+![Figure 8](../preuves/05-image-personnalisee.png)
 
 `docker build` produit `monapp:1.0`, `minikube image load` la copie dans le nœud
 (`minikube image ls` la liste), puis `monapp-deployment.yaml` la déploie sur 2 réplicas
 avec `imagePullPolicy: Never`. Les deux Pods sont `Running` et la page en français est
-servie sur `localhost:8081`.
+servie sur `localhost:8081`, aux couleurs d'EFREI, comme le montre la vue navigateur
+de la figure 9.
 
-## Nettoyage (§10)
+![Figure 9](../preuves/05b-navigateur-monapp.png)
 
-![Figure 7](../preuves/10-nettoyage.png)
+## Nettoyage (partie 10)
+
+![Figure 10](../preuves/10-nettoyage.png)
 
 Toutes les ressources sont supprimées, ainsi que le namespace `demo`. On revient au
 namespace `default` et `minikube stop` arrête le nœud. Le cluster est conservé et
 pourra redémarrer sans tout retélécharger.
 
-## Questions de synthèse (§8)
+## Questions de synthèse (partie 8)
 
 **Pod autonome et Pod géré par un Deployment.** Le Pod autonome n'a aucun propriétaire :
-supprimé ou planté, il est perdu (figure 6). Le Pod géré par un Deployment appartient à
-un ReplicaSet qui maintient le nombre de réplicas voulu (figure 3). Le Deployment apporte
+supprimé ou planté, il est perdu (figure 2). Le Pod géré par un Deployment appartient à
+un ReplicaSet qui maintient le nombre de réplicas voulu (figure 4). Le Deployment apporte
 aussi la mise à l'échelle et les mises à jour progressives avec retour arrière.
 
 **Rôle du ReplicaSet dans l'auto-réparation.** Il compare en continu le nombre de Pods qui
